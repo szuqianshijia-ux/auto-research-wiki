@@ -93,9 +93,13 @@ try {
     const body = await request(
       `/api/v1/projects/current/files?root=${encodeURIComponent(root)}&recursive=true&maxFiles=10000`,
     )
+    if (body.error) {
+      console.error(`Error: ${body.error}`)
+      process.exit(1)
+    }
     function walk(nodes) {
       for (const n of nodes || []) {
-        if (n.type === "file") console.log(n.path)
+        if (!n.isDir) console.log(n.path)
         if (n.children) walk(n.children)
       }
     }
