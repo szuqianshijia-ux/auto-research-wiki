@@ -239,7 +239,7 @@ def main():
 
     # --- 将转换后的 Markdown 复制到 raw/sources/markdown/ ---
     if converted_md_paths and args.add_to_sources:
-        sources_md_dir = cfg.WIKI_PAPERS_BASE.parent / "markdown"
+        sources_md_dir = cfg.WIKI_PAPERS_BASE.parent.parent / "sources" / "markdown"
         sources_md_dir.mkdir(parents=True, exist_ok=True)
         print(f"\n[MinerU] 复制 {len(converted_md_paths)} 个 Markdown 到 sources...")
         for md in converted_md_paths:
