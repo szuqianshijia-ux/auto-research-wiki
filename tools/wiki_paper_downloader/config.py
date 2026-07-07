@@ -29,18 +29,20 @@ UNPAYWALL_EMAIL: str = os.environ.get("UNPAYWALL_EMAIL", "")
 SEMANTIC_SCHOLAR_API_KEY: str = os.environ.get("SEMANTIC_SCHOLAR_API_KEY", "")
 
 # Wiki 多项目配置
-# 每个项目有唯一的 UUID 和对应的 raw/sources 基目录
+# PDF 存放在 raw/pdfs/（不被 LLM Wiki 索引）。
+# 转换后的 Markdown 放在 raw/sources/markdown/（LLM Wiki 索引这里）。
 # 通过环境变量配置（见 .env.example）
 _AUTO_RESEARCH_DIR: str = os.environ.get("AUTO_RESEARCH_DIR", "")
 
 PROJECTS: dict = {
     "embodied": {
         "id": os.environ.get("EMBODIED_PROJECT_ID", ""),
-        "base": Path(os.path.join(_AUTO_RESEARCH_DIR, "knowledge_bases/02_embodied_intelligence/raw/sources")) if _AUTO_RESEARCH_DIR else Path("raw/sources"),
+        # base 指向 raw/pdfs/，不是 raw/sources/，避免 PDF 进入 LLM Wiki 索引范围
+        "base": Path(os.path.join(_AUTO_RESEARCH_DIR, "knowledge_bases/02_embodied_intelligence/raw/pdfs")) if _AUTO_RESEARCH_DIR else Path("raw/pdfs"),
     },
     "vibration": {
         "id": os.environ.get("VIBRATION_PROJECT_ID", ""),
-        "base": Path(os.path.join(_AUTO_RESEARCH_DIR, "research_project/raw/sources")) if _AUTO_RESEARCH_DIR else Path("raw/sources"),
+        "base": Path(os.path.join(_AUTO_RESEARCH_DIR, "research_project/raw/pdfs")) if _AUTO_RESEARCH_DIR else Path("raw/pdfs"),
     },
 }
 
