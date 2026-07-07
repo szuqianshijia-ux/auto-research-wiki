@@ -22,6 +22,8 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+_HERE = Path(__file__).parent
+
 try:
     import yaml
     HAS_YAML = True
@@ -258,6 +260,7 @@ def main():
     parser.add_argument("--milestones", default="milestones.yaml", help="Path to milestones YAML")
     parser.add_argument("--experiments", default="raw/sources/experiments", help="Path to experiment logs directory")
     parser.add_argument("--output", default=None, help="Output file path (default: stdout)")
+    parser.add_argument("--no-rescan", action="store_true", help="Skip Wiki rescan after writing")
     args = parser.parse_args()
 
     milestones_config = load_milestones(args.milestones)
@@ -274,6 +277,16 @@ def main():
             ms = milestones_config.get("milestones", [])
             completed = sum(1 for m in ms if m.get("status") == "completed")
             print(f"  Milestones: {completed}/{len(ms)}, Experiments: {len(experiments)}")
+
+        if not args.no_rescan:
+            try:
+                tools_dir = str(_HERE.parent)
+                if tools_dir not in sys.path:
+                    sys.path.insert(0, tools_dir)
+                from wiki_paper_downloader import wiki_sync
+                wiki_sync.rescan(verbose=True)
+            except Exception as e:
+                print(f"  [Wiki] Rescan skipped: {e}")
     else:
         print(board)
 

@@ -39,6 +39,8 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+_HERE = Path(__file__).parent
+
 
 def load_metrics_from_json(path: str) -> dict:
     with open(path, encoding="utf-8") as f:
@@ -175,6 +177,7 @@ def main():
     parser.add_argument("--notes", default="", help="Free-text notes about the experiment")
     parser.add_argument("--tags", default="", help="Comma-separated tags")
     parser.add_argument("--output", default=".", help="Output directory for the markdown file")
+    parser.add_argument("--no-rescan", action="store_true", help="Skip Wiki rescan after writing")
     args = parser.parse_args()
 
     metrics = {}
@@ -203,6 +206,16 @@ def main():
     print(f"Wrote experiment log: {out_path}")
     print(f"  Metrics: {len(metrics)} entries")
     print(f"  Tags: {tags or ['experiment', 'training']}")
+
+    if not args.no_rescan:
+        try:
+            tools_dir = str(_HERE.parent)
+            if tools_dir not in sys.path:
+                sys.path.insert(0, tools_dir)
+            from wiki_paper_downloader import wiki_sync
+            wiki_sync.rescan(verbose=True)
+        except Exception as e:
+            print(f"  [Wiki] Rescan skipped: {e}")
 
 
 if __name__ == "__main__":
