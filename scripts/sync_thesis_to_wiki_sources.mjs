@@ -9,7 +9,7 @@ const OUT_DIR =
   path.join(ROOT, "wiki_upload_thesis_context")
 const WIKI_SOURCES_DIR =
   process.env.LLM_WIKI_THESIS_SOURCES_DIR ||
-  "${AUTO_RESEARCH_DIR}/research_project/raw/sources/research_context"
+  path.join(process.env.AUTO_RESEARCH_DIR || ".", "research_project/raw/sources/research_context")
 
 const COPY_RULES = [
   ["thesis/论文总入口.md", "01_thesis_mainline/论文总入口.md"],
@@ -165,7 +165,7 @@ function usage() {
 
 Environment:
   THESIS_WIKI_UPLOAD_DIR       default: ./wiki_upload_thesis_context
-  LLM_WIKI_THESIS_SOURCES_DIR  default: ${AUTO_RESEARCH_DIR}/research_project/raw/sources/research_context`)
+  LLM_WIKI_THESIS_SOURCES_DIR  default: \${AUTO_RESEARCH_DIR}/research_project/raw/sources/research_context`)
 }
 
 function ensureDir(dir) {

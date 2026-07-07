@@ -117,6 +117,7 @@ def save_cache(entries, raw):
         raw["entries"] = entries
     else:
         raw = entries
+    CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
     with open(CACHE_PATH, "w") as f:
         json.dump(raw, f, ensure_ascii=False, indent=2)
 

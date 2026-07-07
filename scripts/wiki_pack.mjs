@@ -6,7 +6,7 @@ import path from "node:path"
 const API_BASE = process.env.LLM_WIKI_API_BASE || "http://127.0.0.1:19828"
 const APP_STATE =
   process.env.LLM_WIKI_APP_STATE ||
-  "${LLM_WIKI_APP_STATE}"
+  path.join(process.env.HOME || "", ".local/share/com.llmwiki.app/app-state.json")
 
 const DEFAULT_QUERIES = [
   "research topic overview",
