@@ -1,0 +1,37 @@
+# Checkpoint 结构验证配置
+#
+# 定义 checkpoint 目录的预期结构，用于 checkpoint_validator.py 验证。
+# 根据你的训练框架调整这些字段。
+
+# 必须存在的子目录
+required_dirs:
+  - params
+
+# 必须存在的文件（相对于 checkpoint 根目录）
+required_files:
+  - params/_METADATA
+
+# 可选子目录（存在则报告，不存在不报错）
+optional_dirs:
+  - assets
+  - train_state
+
+# norm_stats 检查
+asset_check:
+  enabled: true
+  norm_stats_file: norm_stats.json
+
+# 平级检查：这些目录必须在 checkpoint 根目录下平级存在
+# 用于检测 GCS 下载等操作导致的嵌套错误
+sibling_check:
+  - [params, assets]
+
+# 临时文件模式（存在则警告，说明下载/保存未完成）
+temp_file_patterns:
+  - "*.gstmp"
+  - "*.tmp"
+  - "*.partial"
+  - "*.downloading"
+
+# 最小文件大小检查（bytes），跳过小于此大小的文件
+min_file_size: 1

@@ -1,0 +1,109 @@
+# {{PROJECT_NAME}} 项目工作区
+
+## Wiki-First 原则
+
+制定计划、分析实验结果、写技术总结或做架构决策前，**先检索 wiki**：
+
+```bash
+node scripts/wiki_pack.mjs                         # 生成证据包（推荐）
+node scripts/wiki_search.mjs search "<关键词>" 8   # 快速单次搜索
+```
+
+**以下情况跳过**（直接动手更快）：调试报错/traceback、查文件路径、单步 git/shell 操作、闲谈澄清、简单文本编辑。
+
+详细流程见 `.claude/skills/wiki-knowledge-loop/SKILL.md`。
+
+---
+
+## 目录结构
+
+```
+{{PROJECT_ROOT}}/
+├── scripts/                    # Wiki 工具脚本
+│   ├── wiki_search.mjs         # 单次搜索知识库
+│   ├── wiki_pack.mjs           # 批量打包证据包
+│   └── sync_notes_to_wiki.mjs  # 同步对话摘要到知识库
+├── notes/
+│   ├── chat_summaries/         # 对话摘要（写完后同步到 wiki）
+│   └── wiki_logs/              # wiki_pack 生成的证据包
+├── docs/                       # 深度技术文档
+├── .claude/
+│   ├── CLAUDE.md               # 本文件
+│   ├── skills/wiki-knowledge-loop/SKILL.md
+│   └── commands/
+│       ├── wiki-write.md
+│       └── wiki-summary.md
+└── {{WIKI_VAULT_DIR}}/         # LLM Wiki vault
+    ├── .llm-wiki/project.json
+    ├── wiki/
+    └── raw/sources/
+```
+
+## 知识库说明
+
+| 知识库 | 项目 ID | 用途 |
+|--------|---------|------|
+| {{KB_NAME}}（主搜索库） | `{{WIKI_PROJECT_ID}}` | 搜索领域知识 |
+
+## 常用命令
+
+```bash
+# 开始新对话前：生成证据包
+node scripts/wiki_pack.mjs
+
+# 搜索特定主题
+node scripts/wiki_search.mjs search "{{EXAMPLE_QUERY_1}}" 8
+node scripts/wiki_search.mjs search "{{EXAMPLE_QUERY_2}}" 8
+
+# 对话结束后：同步摘要到知识库
+node scripts/sync_notes_to_wiki.mjs --rescan
+```
+
+## 对话摘要规范
+
+对话结束后写 `notes/chat_summaries/YYYYMMDD_类别_主题.md`，类别自定义（如：训练/数据/部署/调试/实验/配置/分析）。
+
+```markdown
+# YYYYMMDD 类别 主题
+
+## 元数据
+- 文档类型：聊天会话总结 / Wiki 入口索引
+- 日期：YYYY-MM-DD
+- 主题：[一句话]
+- Wiki证据包路径：`notes/wiki_logs/YYYY-MM-DD_HH-MM_evidence.md`
+- 关联深度文档：[文件路径列表 或 none]
+- 关联模块：[相关代码模块 或 none]
+- 关键词：[逗号分隔]
+
+## 这次会话解决了什么
+[具体描述，要点形式]
+
+## 关键结论
+[最重要的发现或决策，1-3 条]
+
+## 产出文件
+[本次产生的代码/配置/文档/数据改动列表]
+
+## 对项目的影响
+[说明对项目方向或方案的影响]
+
+## 后续建议
+[下次对话应关注什么]
+
+## 同步状态
+- [ ] sync_notes_to_wiki.mjs --dry-run 已校验
+- [ ] 正式 sync 已执行
+- [ ] 已在 LLM Wiki 中 Rescan Raw Sources
+```
+
+深度技术细节放独立文档 `docs/YYYYMMDD_主题详情.md`，摘要只做索引链接。
+
+写完后执行：
+```bash
+node scripts/sync_notes_to_wiki.mjs --dry-run    # 先预览
+node scripts/sync_notes_to_wiki.mjs --rescan      # 确认后正式同步
+```
+
+## Wiki 工作流
+
+详见 `.claude/skills/wiki-knowledge-loop/SKILL.md`

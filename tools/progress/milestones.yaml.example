@@ -1,0 +1,52 @@
+# 研究项目里程碑配置
+#
+# 复制为 milestones.yaml 并根据项目调整。
+# 用法: python tools/progress/milestones.py --config milestones.yaml
+
+project: "My Research Project"
+description: "Project description here"
+
+milestones:
+  - id: m1
+    title: "Literature Review"
+    status: completed        # pending | in_progress | completed | blocked
+    due: 2026-07-15
+    completed_at: 2026-07-10
+    notes: "Reviewed 50 papers, built knowledge graph"
+    wiki_refs:
+      - "literature-review-summary"
+      - "key-papers-comparison"
+
+  - id: m2
+    title: "Data Collection"
+    status: in_progress
+    due: 2026-08-01
+    depends_on: [m1]
+    notes: "Target: 500 episodes"
+    progress: "380/500 episodes collected"
+    wiki_refs:
+      - "data-collection-protocol"
+
+  - id: m3
+    title: "Model Training v1"
+    status: pending
+    due: 2026-08-15
+    depends_on: [m2]
+    notes: "Baseline training with collected data"
+    experiments:
+      - name: "baseline_v1"
+        status: pending
+
+  - id: m4
+    title: "Evaluation & Analysis"
+    status: pending
+    due: 2026-09-01
+    depends_on: [m3]
+    notes: "Evaluate on test scenarios"
+
+  - id: m5
+    title: "Paper Writing"
+    status: pending
+    due: 2026-10-01
+    depends_on: [m3, m4]
+    notes: "Draft + submission"
