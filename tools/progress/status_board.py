@@ -229,7 +229,12 @@ def generate_board(milestones_config: dict | None, experiments: list[dict]) -> s
             for km in key_metrics:
                 v = exp["metrics"].get(km, "-")
                 if isinstance(v, float):
-                    values.append(f"{v:.4f}")
+                    if v == int(v) and abs(v) < 1e15:
+                        values.append(str(int(v)))
+                    elif abs(v) < 0.001 and v != 0:
+                        values.append(f"{v:.6f}")
+                    else:
+                        values.append(f"{v:.4f}")
                 else:
                     values.append(str(v))
             row = f"| {exp['title'][:30]} | {date} | " + " | ".join(values) + " |"

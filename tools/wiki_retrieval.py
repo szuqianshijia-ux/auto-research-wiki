@@ -43,22 +43,52 @@ def _headers():
     return {"X-LLM-Wiki-Token": TOKEN, "Content-Type": "application/json"}
 
 
+def _check_config():
+    if not TOKEN:
+        print("[ERROR] LLM_WIKI_API_TOKEN not set. Add it to .env or export it.", file=sys.stderr)
+        sys.exit(1)
+    if not PROJECT_ID:
+        print("[ERROR] WIKI_PROJECT_ID not set. Add it to .env or export it.", file=sys.stderr)
+        sys.exit(1)
+
+
 def _get(url: str) -> dict:
     req = urllib.request.Request(url, headers=_headers())
-    with urllib.request.urlopen(req, timeout=15) as resp:
-        return json.loads(resp.read())
+    try:
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            return json.loads(resp.read())
+    except urllib.error.HTTPError as e:
+        print(f"[ERROR] HTTP {e.code}: {e.reason} — URL: {url}", file=sys.stderr)
+        if e.code == 401:
+            print("Check LLM_WIKI_API_TOKEN is correct.", file=sys.stderr)
+        sys.exit(1)
+    except urllib.error.URLError as e:
+        print(f"[ERROR] Cannot connect to LLM Wiki: {e.reason}", file=sys.stderr)
+        print(f"Ensure LLM Wiki is running at {BASE_URL}", file=sys.stderr)
+        sys.exit(1)
 
 
 def _post(url: str, body: dict) -> dict:
     data = json.dumps(body).encode()
     req = urllib.request.Request(url, data=data, headers=_headers(), method="POST")
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        return json.loads(resp.read())
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            return json.loads(resp.read())
+    except urllib.error.HTTPError as e:
+        print(f"[ERROR] HTTP {e.code}: {e.reason} — URL: {url}", file=sys.stderr)
+        if e.code == 401:
+            print("Check LLM_WIKI_API_TOKEN is correct.", file=sys.stderr)
+        sys.exit(1)
+    except urllib.error.URLError as e:
+        print(f"[ERROR] Cannot connect to LLM Wiki: {e.reason}", file=sys.stderr)
+        print(f"Ensure LLM Wiki is running at {BASE_URL}", file=sys.stderr)
+        sys.exit(1)
 
 
 # ── Wiki API calls ────────────────────────────────────────────────────────────
 
 def api_search(query: str, topK: int = 5, include_content: bool = True) -> list[dict]:
+    _check_config()
     url = f"{BASE_URL}/projects/{PROJECT_ID}/search"
     resp = _post(url, {"query": query, "topK": topK, "includeContent": include_content})
     return resp.get("results", [])
