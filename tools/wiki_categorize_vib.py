@@ -7,7 +7,7 @@
 
 category 取值：
   paper          — 研究论文（arXiv ID / Year-Author / Author_Year / Elsevier 等）
-  thesis-chapter — 毕业论文章节稿（01绪论.md 等）
+  thesis-chapter — 论文章节稿
   experiment     — 实验记录与数据报告
   report         — 综合研究报告、文献矩阵、深度研究
   management     — 管理文档（清单、计划、协议、说明）
@@ -19,7 +19,7 @@ import unicodedata
 from datetime import datetime
 from pathlib import Path
 
-VIB_ROOT = Path("${AUTO_RESEARCH_DIR}/video_vibration_research_complete")
+VIB_ROOT = Path("${AUTO_RESEARCH_DIR}/research_project")
 SOURCES = VIB_ROOT / "wiki/sources"
 CACHE_PATH = VIB_ROOT / ".llm-wiki/ingest-cache.json"
 TODAY = datetime.now().strftime("%Y-%m-%d")
@@ -54,7 +54,7 @@ def detect_category(filename: str) -> str:
     if re.match(r"^2[01][0-9]{2}\.[0-9]{4,5}", name):
         return "paper"
 
-    # ── 毕业论文章节 ─────────────────────────────────────────────────────────
+    # ── 论文章节 ─────────────────────────────────────────────────────────
     # 01绪论, 01_OUTLINE, 02理论基础, 03S1静态场景
     if re.match(r"^0[1-9][一-鿿_A-Z]", name):
         return "thesis-chapter"
@@ -63,7 +63,7 @@ def detect_category(filename: str) -> str:
     if "臧宗迪" in name or "thesis_e2e" in name:
         return "thesis-chapter"
     # 论文提纲/大纲
-    if name in ["论文大纲", "论文提纲", "论文总入口", "论文写作材料包"]:
+    if name in ["论文大纲", "论文提纲", "项目总入口", "写作材料包"]:
         return "thesis-chapter"
 
     # ── 实验记录 ─────────────────────────────────────────────────────────────

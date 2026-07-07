@@ -41,13 +41,13 @@ async function request(path, options = {}) {
 function printUsage() {
   console.log(`Usage:
   node scripts/wiki_search.mjs search "相机运动 S2" [topK]
-  node scripts/wiki_search.mjs content "wiki/sources/04S2相机运动.md"
+  node scripts/wiki_search.mjs content "wiki/sources/example-page.md"
   node scripts/wiki_search.mjs files [wiki|sources|all]
-  node scripts/wiki_search.mjs graph "SSI-COV" [limit]
+  node scripts/wiki_search.mjs graph "keyword" [limit]
 
 Examples for Claude/Codex:
   node scripts/wiki_search.mjs search "相机运动补偿 Lee 2020 S2" 8
-  node scripts/wiki_search.mjs search "p08 单锚点 尺度传递 p03 p13" 8
+  node scripts/wiki_search.mjs search "example search query" 8
 `)
 }
 

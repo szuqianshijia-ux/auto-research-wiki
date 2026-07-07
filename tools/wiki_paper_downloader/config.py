@@ -37,7 +37,7 @@ PROJECTS: dict = {
     },
     "vibration": {
         "id": "${VIBRATION_PROJECT_ID}",
-        "base": Path("${AUTO_RESEARCH_DIR}/video_vibration_research_complete/raw/sources"),
+        "base": Path("${AUTO_RESEARCH_DIR}/research_project/raw/sources"),
     },
 }
 

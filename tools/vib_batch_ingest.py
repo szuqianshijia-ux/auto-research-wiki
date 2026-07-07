@@ -22,7 +22,7 @@ from datetime import datetime
 from pathlib import Path
 
 # ─── 配置（振动项目）────────────────────────────────────────────────────────
-VIB_ROOT = Path("${AUTO_RESEARCH_DIR}/video_vibration_research_complete")
+VIB_ROOT = Path("${AUTO_RESEARCH_DIR}/research_project")
 KB_ROOT = VIB_ROOT
 WIKI_DIR = VIB_ROOT / "wiki"
 INGEST_CACHE = VIB_ROOT / ".llm-wiki/ingest-cache.json"
@@ -91,8 +91,8 @@ def generate_source_page(source_content: str, filename: str, example: str) -> st
     today = datetime.now().strftime("%Y-%m-%d")
     system = f"""你是一个知识库构建助手，负责将原始文档转换为结构化的 wiki/sources 页面。
 
-知识库目的：组织视频相位法振动测量研究的材料，帮助回答：
-- 基于相位的振动测量方法与算法
+知识库目的：组织研究材料，帮助回答：
+- 研究领域的方法与算法
 - 相机运动补偿与6DOF校正技术
 - 运动放大、相位估计、频率识别方法
 - 抗干扰实验设计与验证
@@ -104,7 +104,7 @@ def generate_source_page(source_content: str, filename: str, example: str) -> st
 规则：
 1. 必须使用 YAML frontmatter（---），包含 type/title/created/updated/tags/related/sources 字段
 2. type 固定为 source
-3. tags 是小写英文标签列表，与振动测量相关（如 vibration, phase-based, modal-analysis, camera-motion）
+3. tags 是小写英文标签列表，与研究领域相关
 4. related 是相关 wiki 页面的 kebab-case 标识符列表（不含路径）
 5. sources 列表包含原始文件名
 6. 正文用中文，技术术语保留英文
@@ -121,7 +121,7 @@ def generate_source_page(source_content: str, filename: str, example: str) -> st
 文档内容（前5000字）：
 {source_content[:5000]}
 
-请生成一个结构化的 wiki/sources 页面，提炼论文核心贡献和方法，与振动测量研究方向关联。""",
+请生成一个结构化的 wiki/sources 页面，提炼论文核心贡献和方法，与研究方向关联。""",
         }
     ]
     return call_llm(messages, system=system, max_tokens=3000)

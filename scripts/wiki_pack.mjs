@@ -9,10 +9,10 @@ const APP_STATE =
   "${LLM_WIKI_APP_STATE}"
 
 const DEFAULT_QUERIES = [
-  "毕业论文主线 S1 S2 S3 p08 单锚点 尺度传递",
-  "S2 相机运动 p03 p08 p13 GT 闭环",
+  "research topic overview",
+  "methodology and experiments",
   "相机自运动补偿 视频测振 Lee 2020 Su 2025",
-  "全场振动 SSI-COV no-GT 结构一致性",
+  "validation and results",
 ]
 
 function loadToken() {
@@ -76,8 +76,8 @@ function usage() {
   node scripts/wiki_pack.mjs [--out tmp/wiki_context.md] [--topK 8] [--full 3] "query 1" "query 2"
 
 Examples:
-  node scripts/wiki_pack.mjs "S2 相机运动 p03 p08 p13" "相机自运动补偿 Lee 2020"
-  node scripts/wiki_pack.mjs --out tmp/wiki_s2.md --topK 10 --full 5 "S2 GT 闭环 单锚点尺度传递"
+  node scripts/wiki_pack.mjs "topic A keywords" "topic B keywords"
+  node scripts/wiki_pack.mjs --out tmp/context.md --topK 10 --full 5 "detailed query"
 
 If no query is provided, the script uses thesis-default queries for S1/S2/S3.`)
 }

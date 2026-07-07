@@ -23,7 +23,7 @@ import urllib.error
 # ── Config ────────────────────────────────────────────────────────────────────
 # 支持通过环境变量覆盖，默认为具身智能项目
 # 用法：WIKI_PROJECT_ID=${VIBRATION_PROJECT_ID} \
-#       WIKI_KB_PATH=${AUTO_RESEARCH_DIR}/video_vibration_research_complete \
+#       WIKI_KB_PATH=${AUTO_RESEARCH_DIR}/research_project \
 #       python3 wiki_retrieval.py "query"
 
 BASE_URL   = "http://localhost:19828/api/v1"

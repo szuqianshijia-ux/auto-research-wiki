@@ -9,7 +9,7 @@ const OUT_DIR =
   path.join(ROOT, "wiki_upload_thesis_context")
 const WIKI_SOURCES_DIR =
   process.env.LLM_WIKI_THESIS_SOURCES_DIR ||
-  "${AUTO_RESEARCH_DIR}/video_vibration_research_complete/raw/sources/毕业论文项目资料"
+  "${AUTO_RESEARCH_DIR}/research_project/raw/sources/research_context"
 
 const COPY_RULES = [
   ["thesis/论文总入口.md", "01_thesis_mainline/论文总入口.md"],
@@ -17,17 +17,17 @@ const COPY_RULES = [
   ["thesis/论文大纲.md", "01_thesis_mainline/论文大纲.md"],
   ["thesis/论文图表与证据索引.md", "01_thesis_mainline/论文图表与证据索引.md"],
   ["thesis/论文图表标题与图注草稿.md", "01_thesis_mainline/论文图表标题与图注草稿.md"],
-  ["thesis/毕业论文写作推进计划.md", "01_thesis_mainline/毕业论文写作推进计划.md"],
+  ["thesis/写作推进计划.md", "01_thesis_mainline/写作推进计划.md"],
   ["thesis/深度研究报告.md", "01_thesis_mainline/深度研究报告.md"],
   ["thesis/术语表_中文.md", "01_thesis_mainline/术语表_中文.md"],
 
   ["thesis/chapters/00摘要.md", "02_chapters/00摘要.md"],
-  ["thesis/chapters/00证据口径.md", "02_chapters/00证据口径.md"],
+  ["thesis/chapters/00_guidelines.md", "02_chapters/00_guidelines.md"],
   ["thesis/chapters/01绪论.md", "02_chapters/01绪论.md"],
   ["thesis/chapters/02理论基础.md", "02_chapters/02理论基础.md"],
   ["thesis/chapters/03S1静态场景.md", "02_chapters/03S1静态场景.md"],
-  ["thesis/chapters/04S2相机运动.md", "02_chapters/04S2相机运动.md"],
-  ["thesis/chapters/05全场与SSI-COV.md", "02_chapters/05全场与SSI-COV.md"],
+  ["thesis/chapters/04_chapter_4.md", "02_chapters/04_chapter_4.md"],
+  ["thesis/chapters/05_chapter_5.md", "02_chapters/05_chapter_5.md"],
   ["thesis/chapters/06系统实现.md", "02_chapters/06系统实现.md"],
   ["thesis/chapters/07总结展望.md", "02_chapters/07总结展望.md"],
   ["thesis/chapters/章节说明.md", "02_chapters/章节说明.md"],
@@ -71,7 +71,7 @@ const COPY_RULES = [
   ["thesis/pack/literature/01文献背景_cn.md", "05_literature/01文献背景_cn.md"],
   ["thesis/pack/literature/02补充文献_20260526.md", "05_literature/02补充文献_20260526.md"],
   ["thesis/pack/research/深度研究报告集成说明.md", "05_literature/research_pack/深度研究报告集成说明.md"],
-  ["thesis/chat_summaries/2026-07-04_视觉振动测量文献深度综述.md", "05_literature/2026-07-04_视觉振动测量文献深度综述.md"],
+  ["thesis/chat_summaries/2026-07-04_文献深度综述.md", "05_literature/2026-07-04_文献深度综述.md"],
   ["thesis/chat_summaries/2026-07-04_文献精读批注.md", "05_literature/2026-07-04_文献精读批注.md"],
   ["thesis/chat_summaries/2026-07-03_论文精读总结.md", "05_literature/2026-07-03_论文精读总结.md"],
   ["thesis/chat_summaries/2026-07-03_Google_AI_文献调研与方案验证报告.md", "05_literature/2026-07-03_Google_AI_文献调研与方案验证报告.md"],
@@ -107,7 +107,7 @@ const COPY_DIR_RULES = [
 const COPY_DIR_EXCLUDE = new Set([
   "2026-06-23_wiki工作流优化.md",
   "2026-07-03_Google_AI_研究咨询提示词.md",
-  "2026-07-04_视觉振动测量文献深度综述.md",
+  "2026-07-04_文献深度综述.md",
   "2026-07-04_文献精读批注.md",
   "2026-07-03_论文精读总结.md",
   "2026-07-03_Google_AI_文献调研与方案验证报告.md",
@@ -118,7 +118,7 @@ const COPY_DIR_ALLOWED_EXTENSIONS = new Set([".md", ".txt", ".csv", ".json"])
 
 const README = `# LLM Wiki 导入说明
 
-这个文件夹是给 LLM Wiki 导入的毕业论文上下文包，只包含论文写作、实验设计、证据口径和文献矩阵相关资料。
+这个文件夹是给 LLM Wiki 导入的研究上下文包，包含文档、实验记录和文献资料。
 
 ## 使用方式
 
@@ -137,14 +137,6 @@ const README = `# LLM Wiki 导入说明
 
 ## 重要口径
 
-- 论文题目主线是：基于长焦引导短焦相位法的非接触全场振动测量方法研究。
-- S1 负责静态标定和单锚点物理尺度建立。
-- S2 负责真实相机运动条件下的三点 GT 闭环验证。
-- S3 负责多点全场扩展、结构一致性和 SSI-COV 接口。
-- \`p08\` 是单锚点绝对物理尺度来源。
-- \`p03\`、\`p13\` 使用 \`p08\` 的尺度传递验证，不做每点独立增益调参。
-- no-GT 点只能作为结构一致性和候选点筛选证据，不能冒充 GT 验证。
-- 20260505 的 S2 数据列关系为：\`gt_col2=p03\`、\`gt_col3=p08\`、\`gt_col4=p13\`。
 
 ## 不包含的内容
 
@@ -173,7 +165,7 @@ function usage() {
 
 Environment:
   THESIS_WIKI_UPLOAD_DIR       default: ./wiki_upload_thesis_context
-  LLM_WIKI_THESIS_SOURCES_DIR  default: ${AUTO_RESEARCH_DIR}/video_vibration_research_complete/raw/sources/毕业论文项目资料`)
+  LLM_WIKI_THESIS_SOURCES_DIR  default: ${AUTO_RESEARCH_DIR}/research_project/raw/sources/research_context`)
 }
 
 function ensureDir(dir) {

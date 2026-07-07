@@ -54,7 +54,7 @@ wiki_sync.rescan()
 # 具身智能项目下载论文（自动 rescan 打到具身智能）
 WIKI_PROJECT=embodied python3 download.py 2509.18644 --dir training
 
-# 视频相位法项目下载论文（自动 rescan 打到视频相位法）
+# 项目 B 下载论文
 WIKI_PROJECT=vibration python3 download.py 2301.12345 --dir papers
 
 # 两条命令可以同时执行（在两个终端窗口）
@@ -64,7 +64,7 @@ WIKI_PROJECT=vibration python3 download.py 2301.12345 --dir papers
 | 别名 | 项目 ID | 基目录 |
 |------|--------|--------|
 | `embodied` | `${EMBODIED_PROJECT_ID}` | `${AUTO_RESEARCH_DIR}/knowledge_bases/02_embodied_intelligence/raw/sources` |
-| `vibration` | `${VIBRATION_PROJECT_ID}` | `${AUTO_RESEARCH_DIR}/video_vibration_research_complete/raw/sources` |
+| `project_b` | `${VIBRATION_PROJECT_ID}` | `${AUTO_RESEARCH_DIR}/research_project/raw/sources` |
 
 ## 目录别名
 

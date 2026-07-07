@@ -48,7 +48,7 @@ node scripts/sync_thesis_to_wiki_sources.mjs
 4. 搜索 Wiki 知识库：
 
 ```bash
-node scripts/wiki_search.mjs search "相位法振动测量" 8
+node scripts/wiki_search.mjs search "your search keywords" 8
 ```
 
 5. 生成写作证据包：
