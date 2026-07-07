@@ -30,14 +30,17 @@ SEMANTIC_SCHOLAR_API_KEY: str = os.environ.get("SEMANTIC_SCHOLAR_API_KEY", "")
 
 # Wiki 多项目配置
 # 每个项目有唯一的 UUID 和对应的 raw/sources 基目录
+# 通过环境变量配置（见 .env.example）
+_AUTO_RESEARCH_DIR: str = os.environ.get("AUTO_RESEARCH_DIR", "")
+
 PROJECTS: dict = {
     "embodied": {
-        "id": "${EMBODIED_PROJECT_ID}",
-        "base": Path("${AUTO_RESEARCH_DIR}/knowledge_bases/02_embodied_intelligence/raw/sources"),
+        "id": os.environ.get("EMBODIED_PROJECT_ID", ""),
+        "base": Path(os.path.join(_AUTO_RESEARCH_DIR, "knowledge_bases/02_embodied_intelligence/raw/sources")) if _AUTO_RESEARCH_DIR else Path("raw/sources"),
     },
     "vibration": {
-        "id": "${VIBRATION_PROJECT_ID}",
-        "base": Path("${AUTO_RESEARCH_DIR}/research_project/raw/sources"),
+        "id": os.environ.get("VIBRATION_PROJECT_ID", ""),
+        "base": Path(os.path.join(_AUTO_RESEARCH_DIR, "research_project/raw/sources")) if _AUTO_RESEARCH_DIR else Path("raw/sources"),
     },
 }
 
@@ -49,7 +52,7 @@ _ACTIVE_PROJECT: str = os.environ.get("WIKI_PROJECT", "embodied")
 WIKI_PAPERS_BASE: Path = Path(
     os.environ.get(
         "WIKI_PAPERS_BASE",
-        str(PROJECTS[_ACTIVE_PROJECT]["base"] / "papers"),
+        str(PROJECTS.get(_ACTIVE_PROJECT, PROJECTS["embodied"])["base"] / "papers"),
     )
 )
 

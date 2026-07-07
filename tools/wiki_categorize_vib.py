@@ -14,12 +14,15 @@ category 取值：
 """
 
 import json
+import os
 import re
 import unicodedata
 from datetime import datetime
 from pathlib import Path
 
-VIB_ROOT = Path("${AUTO_RESEARCH_DIR}/research_project")
+_auto_research_dir = os.environ.get("AUTO_RESEARCH_DIR", "")
+_vib_subpath = os.environ.get("WIKI_VIB_SUBPATH", "research_project")
+VIB_ROOT = Path(os.path.join(_auto_research_dir, _vib_subpath)) if _auto_research_dir else Path(".")
 SOURCES = VIB_ROOT / "wiki/sources"
 CACHE_PATH = VIB_ROOT / ".llm-wiki/ingest-cache.json"
 TODAY = datetime.now().strftime("%Y-%m-%d")

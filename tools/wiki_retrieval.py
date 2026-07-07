@@ -26,16 +26,16 @@ import urllib.error
 #       WIKI_KB_PATH=${AUTO_RESEARCH_DIR}/research_project \
 #       python3 wiki_retrieval.py "query"
 
-BASE_URL   = "http://localhost:19828/api/v1"
-TOKEN      = "${LLM_WIKI_API_TOKEN}"
-PROJECT_ID = os.environ.get("WIKI_PROJECT_ID", "${EMBODIED_PROJECT_ID}")
-KB_PATH    = os.environ.get("WIKI_KB_PATH", "${AUTO_RESEARCH_DIR}/knowledge_bases/02_embodied_intelligence")
-GRAPH_INDEX_PATH    = os.path.join(KB_PATH, ".llm-wiki", "graph-index.json")
-COMMUNITY_INDEX_PATH = os.path.join(KB_PATH, ".llm-wiki", "community-index.json")
+BASE_URL   = os.environ.get("LLM_WIKI_BASE_URL", "http://localhost:19828/api/v1")
+TOKEN      = os.environ.get("LLM_WIKI_API_TOKEN", "")
+PROJECT_ID = os.environ.get("WIKI_PROJECT_ID", "")
+KB_PATH    = os.environ.get("WIKI_KB_PATH", "")
+GRAPH_INDEX_PATH    = os.path.join(KB_PATH, ".llm-wiki", "graph-index.json") if KB_PATH else ""
+COMMUNITY_INDEX_PATH = os.path.join(KB_PATH, ".llm-wiki", "community-index.json") if KB_PATH else ""
 
-AUTEL_API_URL  = "https://llmapi.autel.com/v1/chat/completions"
-AUTEL_API_KEY  = None   # read from ~/.claude/settings.json at startup
-AUTEL_MODEL    = "claude-sonnet-4-20250514"
+LLM_API_URL  = os.environ.get("LLM_API_ENDPOINT", "")
+LLM_API_KEY  = None
+LLM_MODEL    = os.environ.get("LLM_MODEL", "claude-sonnet-4-20250514")
 
 # ── HTTP helpers ──────────────────────────────────────────────────────────────
 
@@ -254,7 +254,7 @@ def build_community_index() -> list[dict]:
 
 def _llm_community_summary(community_id: int, slugs: list[str], total: int) -> str:
     """Call Autel API to generate a 2-sentence community summary."""
-    key = _get_autel_key()
+    key = _get_llm_key()
     if not key:
         return f"Community {community_id} ({total} pages): " + ", ".join(slugs[:5])
 
@@ -268,11 +268,11 @@ def _llm_community_summary(community_id: int, slugs: list[str], total: int) -> s
         "Content-Type": "application/json",
     }
     body = json.dumps({
-        "model": AUTEL_MODEL,
+        "model": LLM_MODEL,
         "max_tokens": 150,
         "messages": [{"role": "user", "content": prompt}],
     }).encode()
-    req = urllib.request.Request(AUTEL_API_URL, data=body, headers=headers, method="POST")
+    req = urllib.request.Request(LLM_API_URL, data=body, headers=headers, method="POST")
     try:
         with urllib.request.urlopen(req, timeout=20) as resp:
             data = json.loads(resp.read())
@@ -300,19 +300,22 @@ def _find_relevant_communities(query_slugs: set[str], communities: list[dict], t
     return [c for _, c in scored[:top_n]]
 
 
-# ── Autel API key ─────────────────────────────────────────────────────────────
+# ── LLM API key ──────────────────────────────────────────────────────────────
 
-def _get_autel_key() -> str | None:
-    global AUTEL_API_KEY
-    if AUTEL_API_KEY:
-        return AUTEL_API_KEY
+def _get_llm_key() -> str | None:
+    global LLM_API_KEY
+    if LLM_API_KEY:
+        return LLM_API_KEY
+    LLM_API_KEY = os.environ.get("LLM_API_KEY", "")
+    if LLM_API_KEY:
+        return LLM_API_KEY
     settings_path = os.path.expanduser("~/.claude/settings.json")
     try:
         with open(settings_path) as f:
             settings = json.load(f)
-        AUTEL_API_KEY = settings.get("env", {}).get("ANTHROPIC_AUTH_TOKEN")
-        return AUTEL_API_KEY
-    except Exception:
+        LLM_API_KEY = settings.get("env", {}).get("ANTHROPIC_AUTH_TOKEN")
+        return LLM_API_KEY
+    except (FileNotFoundError, json.JSONDecodeError, KeyError):
         return None
 
 

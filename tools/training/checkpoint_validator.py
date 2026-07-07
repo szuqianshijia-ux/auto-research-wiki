@@ -163,7 +163,11 @@ def validate(ckpt_dir: Path, schema: dict) -> dict:
     empty_files = find_empty_files(ckpt_dir, min_size)
     if empty_files:
         for ef in empty_files[:10]:
-            results["warnings"].append(f"Empty/tiny file: {ef.relative_to(ckpt_dir)} ({ef.stat().st_size} bytes)")
+            try:
+                size = ef.stat().st_size
+                results["warnings"].append(f"Empty/tiny file: {ef.relative_to(ckpt_dir)} ({size} bytes)")
+            except OSError:
+                results["warnings"].append(f"Inaccessible file: {ef.relative_to(ckpt_dir)}")
         if len(empty_files) > 10:
             results["warnings"].append(f"... and {len(empty_files) - 10} more empty files")
 

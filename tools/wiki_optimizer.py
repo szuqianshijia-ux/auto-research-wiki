@@ -25,13 +25,15 @@ from datetime import datetime
 from pathlib import Path
 
 # ─── 配置 ────────────────────────────────────────────────────────────────────
-KB_ROOT = Path("${AUTO_RESEARCH_DIR}/knowledge_bases/02_embodied_intelligence")
+_auto_research_dir = os.environ.get("AUTO_RESEARCH_DIR", "")
+_kb_subpath = os.environ.get("WIKI_KB_SUBPATH", "knowledge_bases/02_embodied_intelligence")
+KB_ROOT = Path(os.path.join(_auto_research_dir, _kb_subpath)) if _auto_research_dir else Path(".")
 WIKI_DIR = KB_ROOT / "wiki"
 BACKUP_DIR = KB_ROOT / ".wiki-backup"
 DUPS_REPORT = KB_ROOT / ".wiki-backup/dups-report.json"
 
-LLM_ENDPOINT = "https://llmapi.autel.com"
-LLM_MODEL = "claude-haiku-4-5-20251001"
+LLM_ENDPOINT = os.environ.get("LLM_API_ENDPOINT", "")
+LLM_MODEL = os.environ.get("LLM_MODEL", "claude-haiku-4-5-20251001")
 
 TYPE_DIRS = {
     "concept": WIKI_DIR / "concepts",
@@ -41,10 +43,18 @@ TYPE_DIRS = {
 
 
 def get_api_key() -> str:
+    key = os.environ.get("LLM_API_KEY", "")
+    if key:
+        return key
     state_path = Path.home() / ".local/share/com.llmwiki.app/app-state.json"
-    with open(state_path) as f:
-        state = json.load(f)
-    return state["llmConfig"]["apiKey"]
+    try:
+        with open(state_path) as f:
+            state = json.load(f)
+        return state["llmConfig"]["apiKey"]
+    except (FileNotFoundError, json.JSONDecodeError, KeyError) as e:
+        print(f"[ERROR] Cannot read API key: {e}", file=sys.stderr)
+        print("Set LLM_API_KEY env var or install LLM Wiki app.", file=sys.stderr)
+        sys.exit(1)
 
 
 def call_llm(messages: list, system: str = "", max_tokens: int = 4096) -> str:

@@ -22,7 +22,9 @@ from datetime import datetime
 from pathlib import Path
 
 # ─── 配置（振动项目）────────────────────────────────────────────────────────
-VIB_ROOT = Path("${AUTO_RESEARCH_DIR}/research_project")
+_auto_research_dir = os.environ.get("AUTO_RESEARCH_DIR", "")
+_vib_subpath = os.environ.get("WIKI_VIB_SUBPATH", "research_project")
+VIB_ROOT = Path(os.path.join(_auto_research_dir, _vib_subpath)) if _auto_research_dir else Path(".")
 KB_ROOT = VIB_ROOT
 WIKI_DIR = VIB_ROOT / "wiki"
 INGEST_CACHE = VIB_ROOT / ".llm-wiki/ingest-cache.json"
@@ -31,20 +33,33 @@ INGEST_CACHE = VIB_ROOT / ".llm-wiki/ingest-cache.json"
 MARKDOWN_DIR = VIB_ROOT / "markdown"
 
 # 需要处理的 markdown 来源目录（raw/sources/ 下）
-SOURCE_DIRS = [
-    VIB_ROOT / "raw/sources/papers/candidates",
-    VIB_ROOT / "raw/sources/papers/6DOF相机运动补偿",
-]
+# 通过 WIKI_SOURCE_DIRS 环境变量覆盖（逗号分隔），或使用默认值
+_source_dirs_env = os.environ.get("WIKI_SOURCE_DIRS", "")
+if _source_dirs_env:
+    SOURCE_DIRS = [Path(d.strip()) for d in _source_dirs_env.split(",") if d.strip()]
+else:
+    SOURCE_DIRS = [
+        VIB_ROOT / "raw/sources/papers/candidates",
+        VIB_ROOT / "raw/sources/papers/6DOF相机运动补偿",
+    ]
 
-LLM_ENDPOINT = "https://llmapi.autel.com"
-LLM_MODEL = "claude-haiku-4-5-20251001"
+LLM_ENDPOINT = os.environ.get("LLM_API_ENDPOINT", "")
+LLM_MODEL = os.environ.get("LLM_MODEL", "claude-haiku-4-5-20251001")
 
 
 def get_api_key() -> str:
+    key = os.environ.get("LLM_API_KEY", "")
+    if key:
+        return key
     state_path = Path.home() / ".local/share/com.llmwiki.app/app-state.json"
-    with open(state_path) as f:
-        state = json.load(f)
-    return state["llmConfig"]["apiKey"]
+    try:
+        with open(state_path) as f:
+            state = json.load(f)
+        return state["llmConfig"]["apiKey"]
+    except (FileNotFoundError, json.JSONDecodeError, KeyError) as e:
+        print(f"[ERROR] Cannot read API key: {e}", file=sys.stderr)
+        print("Set LLM_API_KEY env var or install LLM Wiki app.", file=sys.stderr)
+        sys.exit(1)
 
 
 def file_hash(path: Path) -> str:
@@ -176,7 +191,6 @@ def ingest_file(source_path: Path, dry_run: bool = False) -> bool:
 
     (WIKI_DIR / "sources").mkdir(parents=True, exist_ok=True)
     target.write_text(source_page, encoding="utf-8")
-    os.chmod(target, 0o755)
 
     save_cache(entries, cache, filename, {
         "hash": content_hash,
