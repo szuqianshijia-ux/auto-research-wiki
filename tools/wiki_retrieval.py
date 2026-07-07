@@ -28,7 +28,7 @@ import urllib.error
 
 BASE_URL   = os.environ.get("LLM_WIKI_BASE_URL", "http://localhost:19828/api/v1")
 TOKEN      = os.environ.get("LLM_WIKI_API_TOKEN", "")
-PROJECT_ID = os.environ.get("WIKI_PROJECT_ID", "")
+PROJECT_ID = os.environ.get("WIKI_PROJECT_ID", "") or os.environ.get("EMBODIED_PROJECT_ID", "")
 KB_PATH    = os.environ.get("WIKI_KB_PATH", "")
 GRAPH_INDEX_PATH    = os.path.join(KB_PATH, ".llm-wiki", "graph-index.json") if KB_PATH else ""
 COMMUNITY_INDEX_PATH = os.path.join(KB_PATH, ".llm-wiki", "community-index.json") if KB_PATH else ""

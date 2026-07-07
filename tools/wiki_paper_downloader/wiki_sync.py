@@ -7,7 +7,7 @@ wiki_sync.py — LLM Wiki API 集成。
   get_context() — 多跳智能检索，返回结构化上下文（供 Claude 直接使用）
 
 Token 从 ~/.local/share/com.llmwiki.app/app-state.json 自动读取，
-也可以通过环境变量 LLM_WIKI_TOKEN 覆盖。
+也可以通过环境变量 LLM_WIKI_API_TOKEN（或 LLM_WIKI_TOKEN）覆盖。
 """
 from __future__ import annotations
 
@@ -26,7 +26,7 @@ _SEARCH_TIMEOUT = 15
 
 
 def _read_token() -> str:
-    token = os.environ.get("LLM_WIKI_TOKEN", "")
+    token = os.environ.get("LLM_WIKI_API_TOKEN", "") or os.environ.get("LLM_WIKI_TOKEN", "")
     if token:
         return token
     try:
