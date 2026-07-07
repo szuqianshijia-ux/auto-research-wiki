@@ -35,8 +35,12 @@
 | **知识检索** | 命令行语义搜索 Wiki 知识库 | `scripts/wiki_search.mjs` |
 | | 多关键词证据包生成（写作辅助） | `scripts/wiki_pack.mjs` |
 | | 多跳检索 + 知识图谱社区发现 | `tools/wiki_retrieval.py` |
+| **PDF 转换** | MinerU 将 PDF 转为带 LaTeX 公式的 Markdown（需 GPU） | `tools/wiki_paper_downloader/pdf_converter.py` |
+| | VRAM 预检，有训练进程时自动跳过避免 OOM | |
+| | OOM 自动回退：禁用公式识别重试，magic-pdf.json 始终还原 | |
 | **Wiki 优化** | 近重复页面检测与合并 | `tools/wiki_optimizer.py` |
 | | 超长页面 LLM 压缩 | |
+| | rescan 后自动化后处理（图索引 → 去重 → 压缩） | `scripts/post_rescan.sh` |
 | **Agent 工作流** | Claude Code Agent 模板（CLAUDE.md + Skills） | `agents/` |
 | | Wiki 知识循环技能（搜索→执行→归档） | `agents/skills/` |
 | | /wiki-write、/wiki-summary 命令 | `agents/commands/` |
@@ -70,6 +74,19 @@ cp .env.example .env
 ```bash
 # 下载论文（arXiv ID 或 DOI）
 python tools/wiki_paper_downloader/download.py 2301.12345 --dir papers/core
+
+# 下载 + MinerU 转换（需 GPU 空闲 ≥ 6 GB）
+python tools/wiki_paper_downloader/download.py 2301.12345 --dir papers/core --convert
+
+# 下载 + 转换 + 放入 sources 供 LLM Wiki 索引
+python tools/wiki_paper_downloader/download.py 2301.12345 --dir papers/core \
+    --convert --add-to-sources
+
+# rescan 完成后：更新图索引 + 检测近重复
+bash scripts/post_rescan.sh
+
+# 完整后处理（含社区摘要 + 压缩，较慢）
+bash scripts/post_rescan.sh --community --trim
 
 # 同步资料到 Wiki
 node scripts/sync_thesis_to_wiki_sources.mjs
@@ -138,12 +155,14 @@ python tools/progress/status_board.py \
 │   ├── claude-md-template/                 # CLAUDE.md 项目模板
 │   ├── skills/wiki-knowledge-loop/         # Wiki 知识循环技能
 │   └── commands/                           # /wiki-write, /wiki-summary
-├── scripts/                                # Node.js 工作流脚本
+├── scripts/                                # 工作流脚本
 │   ├── sync_thesis_to_wiki_sources.mjs     # 资料 → Wiki 源目录同步
 │   ├── wiki_search.mjs                     # 知识库搜索
-│   └── wiki_pack.mjs                       # 证据包生成
+│   ├── wiki_pack.mjs                       # 证据包生成
+│   └── post_rescan.sh                      # rescan 后自动化（图索引/去重/压缩）
 ├── tools/                                  # Python 工具
 │   ├── wiki_paper_downloader/              # 论文自动下载器
+│   │   ├── pdf_converter.py               # MinerU 封装（VRAM 预检 + OOM 回退）
 │   ├── training/                           # 训练自动化
 │   │   ├── checkpoint_validator.py         # checkpoint 验证
 │   │   ├── experiment_logger.py            # 实验日志生成
@@ -164,34 +183,43 @@ python tools/progress/status_board.py \
 ## 工作流示意
 
 ```
-论文/资料 ──→ Wiki raw/sources ──→ LLM Wiki Ingest ──→ 知识图谱
-                                                        │
-                     ┌──────────────────────────────────┘
-                     ▼
-              ┌─────────────┐     ┌──────────────┐
-              │ wiki_search │     │  wiki_pack   │
-              │  语义搜索    │     │  证据包生成   │
-              └──────┬──────┘     └──────┬───────┘
-                     │                   │
-                     ▼                   ▼
-              ┌─────────────────────────────────┐
-              │        AI Agent 工作流           │
-              │   /wiki-write → 推理 → 执行     │
-              │   /wiki-summary → 归档 → 同步    │
-              └──────────────┬──────────────────┘
-                             │
-                     ┌───────┴──────────┐
-                     ▼                  ▼
-              ┌────────────┐     ┌────────────┐
-              │  训练自动化  │     │  进度追踪   │
-              │ checkpoint │     │ milestones │
-              │ experiment │     │ status     │
-              │ monitor    │     │ board      │
-              └─────┬──────┘     └──────┬─────┘
-                    │                   │
-                    └───────┬───────────┘
-                            ▼
-                    Wiki raw/sources ──→ rescan ──→ 知识更丰富
+                    ┌───────────────────────────┐
+                    │  download.py 下载 PDF      │
+                    └──────────────┬────────────┘
+                                   │
+                  ┌────────────────▼────────────────┐
+                  │  --convert（可选，需 GPU ≥ 6 GB） │
+                  │  pdf_converter.py                │
+                  │  ① VRAM 预检：有训练进程则跳过    │
+                  │  ② magic-pdf → Markdown + LaTeX │
+                  │  ③ OOM 时禁用公式识别重试         │
+                  └────────────────┬────────────────┘
+                                   │
+               ┌───────────────────▼───────────────────┐
+               │  Wiki raw/sources/                     │
+               │  ├── papers/   ← PDF                  │
+               │  └── markdown/ ← MD（--add-to-sources）│
+               └───────────────────┬───────────────────┘
+                                   │ rescan
+                                   ▼
+                         LLM Wiki Ingest → 知识图谱
+                                   │
+                         post_rescan.sh（rescan 后运行）
+                         ├── 图索引（wiki_retrieval）
+                         ├── 近重复检测（wiki_optimizer）
+                         ├── 合并 / 压缩（可选）
+                         └── 社区摘要（可选，调用 LLM）
+                                   │
+                     ┌─────────────┴──────────────┐
+                     ▼                            ▼
+              ┌─────────────┐            ┌──────────────┐
+              │ wiki_search │            │  wiki_pack   │
+              │  语义搜索    │            │  证据包生成   │
+              └──────┬──────┘            └──────┬───────┘
+                     └──────────┬───────────────┘
+                                ▼
+                       AI Agent 工作流
+                    /wiki-write · /wiki-summary
 ```
 
 ## 多项目管理

@@ -65,3 +65,19 @@ DOWNLOAD_TIMEOUT: int = int(os.environ.get("DOWNLOAD_TIMEOUT", "90"))
 
 # 下载完成后是否自动触发 Wiki Rescan（默认开启，可用 --no-rescan 或环境变量关闭）
 AUTO_RESCAN: bool = os.environ.get("WIKI_AUTO_RESCAN", "1").strip() not in ("0", "false", "no")
+
+# === MinerU PDF 转换（可选）===
+# 是否在下载后自动运行 MinerU 转换（默认关闭）
+MINERU_ENABLED: bool = os.environ.get("MINERU_ENABLED", "0").strip() in ("1", "true", "yes")
+
+# Markdown 输出目录（绝对路径或相对于 AUTO_RESEARCH_DIR）
+# 若未设置，download.py 会自动推导为 raw/sources/../markdown/
+_md_dir_env = os.environ.get("WIKI_MARKDOWN_DIR", "")
+WIKI_MARKDOWN_DIR: Path | None = Path(_md_dir_env) if _md_dir_env else None
+
+# 最低空闲显存阈值（MiB）。低于此值时跳过 MinerU 避免 OOM。
+# RTX 4090 D 上跑训练进程时剩余约 3 GB → 低于默认 6 GB → 自动跳过。
+MINERU_MIN_VRAM_MIB: int = int(os.environ.get("MINERU_MIN_VRAM_MIB", "6144"))
+
+# 是否将转换后的 Markdown 复制到 raw/sources/markdown/ 供 LLM Wiki 索引
+MINERU_ADD_TO_SOURCES: bool = os.environ.get("MINERU_ADD_TO_SOURCES", "0").strip() in ("1", "true", "yes")
