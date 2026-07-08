@@ -56,7 +56,7 @@ def append_checklist(entries: list[dict], topic: str, papers_base: Path) -> Path
             "tags: [papers, auto-download]",
             "---",
             "",
-            f"# 具身智能知识库 · 补充论文清单（{today[:4]}-{today[4:6]}-{today[6:]}）",
+            f"# 补充论文清单（{today[:4]}-{today[4:6]}-{today[6:]}）",
             "",
             "| arXiv/ID | 文件 | 标题 | 目录 | 大小 | 来源 |",
             "| --- | --- | --- | --- | --- | --- |",
