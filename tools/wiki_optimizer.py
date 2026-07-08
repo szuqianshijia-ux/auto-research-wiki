@@ -26,7 +26,7 @@ from pathlib import Path
 
 # ─── 配置 ────────────────────────────────────────────────────────────────────
 _auto_research_dir = os.environ.get("AUTO_RESEARCH_DIR", "")
-_kb_subpath = os.environ.get("WIKI_KB_SUBPATH", "knowledge_bases/02_embodied_intelligence")
+_kb_subpath = os.environ.get("WIKI_KB_SUBPATH", "")
 KB_ROOT = Path(os.path.join(_auto_research_dir, _kb_subpath)) if _auto_research_dir else Path(".")
 WIKI_DIR = KB_ROOT / "wiki"
 BACKUP_DIR = KB_ROOT / ".wiki-backup"

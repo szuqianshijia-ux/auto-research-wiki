@@ -35,14 +35,16 @@ SEMANTIC_SCHOLAR_API_KEY: str = os.environ.get("SEMANTIC_SCHOLAR_API_KEY", "")
 _AUTO_RESEARCH_DIR: str = os.environ.get("AUTO_RESEARCH_DIR", "")
 
 PROJECTS: dict = {
+    # 在 .env 中配置 EMBODIED_PROJECT_ID / VIBRATION_PROJECT_ID 和 AUTO_RESEARCH_DIR。
+    # base 指向 raw/pdfs/（不被 LLM Wiki 索引），转换后 Markdown 放 raw/sources/markdown/。
+    # 根据实际项目目录结构修改 "your_project_a/raw/pdfs" 等占位路径。
     "embodied": {
         "id": os.environ.get("EMBODIED_PROJECT_ID", ""),
-        # base 指向 raw/pdfs/，不是 raw/sources/，避免 PDF 进入 LLM Wiki 索引范围
-        "base": Path(os.path.join(_AUTO_RESEARCH_DIR, "knowledge_bases/02_embodied_intelligence/raw/pdfs")) if _AUTO_RESEARCH_DIR else Path("raw/pdfs"),
+        "base": Path(os.path.join(_AUTO_RESEARCH_DIR, "your_project_a/raw/pdfs")) if _AUTO_RESEARCH_DIR else Path("raw/pdfs"),
     },
     "vibration": {
         "id": os.environ.get("VIBRATION_PROJECT_ID", ""),
-        "base": Path(os.path.join(_AUTO_RESEARCH_DIR, "research_project/raw/pdfs")) if _AUTO_RESEARCH_DIR else Path("raw/pdfs"),
+        "base": Path(os.path.join(_AUTO_RESEARCH_DIR, "your_project_b/raw/pdfs")) if _AUTO_RESEARCH_DIR else Path("raw/pdfs"),
     },
 }
 

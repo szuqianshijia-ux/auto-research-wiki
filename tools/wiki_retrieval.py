@@ -21,9 +21,9 @@ import urllib.request
 import urllib.error
 
 # ── Config ────────────────────────────────────────────────────────────────────
-# 支持通过环境变量覆盖，默认为具身智能项目
-# 用法：WIKI_PROJECT_ID=${VIBRATION_PROJECT_ID} \
-#       WIKI_KB_PATH=${AUTO_RESEARCH_DIR}/research_project \
+# 所有配置均通过环境变量注入，无硬编码项目路径。
+# 用法：WIKI_PROJECT_ID=<your-project-id> \
+#       WIKI_KB_PATH=<path-to-your-kb> \
 #       python3 wiki_retrieval.py "query"
 
 BASE_URL   = os.environ.get("LLM_WIKI_BASE_URL", "http://localhost:19828/api/v1")

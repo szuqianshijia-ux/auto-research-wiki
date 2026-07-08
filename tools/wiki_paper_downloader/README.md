@@ -1,6 +1,6 @@
 # wiki_paper_downloader
 
-多源学术论文下载器，集成到具身智能 LLM Wiki 工作流。
+多源学术论文下载器，集成到 LLM Wiki 工作流。
 
 ## 支持的输入格式
 
@@ -16,7 +16,7 @@
 
 ## 快速开始
 
-### 单项目使用（默认具身智能项目）
+### 单项目使用
 
 ```bash
 # arXiv 单篇（下载后自动触发 Wiki Rescan）
@@ -51,20 +51,18 @@ wiki_sync.rescan()
 支持同时处理两个项目，无需在 LLM Wiki GUI 中切换：
 
 ```bash
-# 具身智能项目下载论文（自动 rescan 打到具身智能）
+# 项目 A 下载论文
 WIKI_PROJECT=embodied python3 download.py 2509.18644 --dir training
 
-# 项目 B 下载论文
-WIKI_PROJECT=vibration python3 download.py 2301.12345 --dir papers
-
-# 两条命令可以同时执行（在两个终端窗口）
+# 项目 B 下载论文（同时进行）
+WIKI_PROJECT=project_b python3 download.py 2301.12345 --dir papers
 ```
 
-**项目别名**：
+**项目别名**（在 `.env` 或 `config.py` 中配置）：
 | 别名 | 项目 ID | 基目录 |
 |------|--------|--------|
-| `embodied` | `${EMBODIED_PROJECT_ID}` | `${AUTO_RESEARCH_DIR}/knowledge_bases/02_embodied_intelligence/raw/sources` |
-| `project_b` | `${VIBRATION_PROJECT_ID}` | `${AUTO_RESEARCH_DIR}/research_project/raw/sources` |
+| `embodied` | `${EMBODIED_PROJECT_ID}` | `${AUTO_RESEARCH_DIR}/your_project_a/raw/pdfs` |
+| `project_b` | `${VIBRATION_PROJECT_ID}` | `${AUTO_RESEARCH_DIR}/your_project_b/raw/pdfs` |
 
 ## 目录别名
 
