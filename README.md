@@ -29,6 +29,7 @@
 | | 多源自动 fallback（arXiv → Unpaywall → Semantic Scholar） | |
 | | 下载后自动触发 Wiki rescan | |
 | **资料管理** | 研究资料按规则同步到 Wiki 源目录 | `scripts/sync_thesis_to_wiki_sources.mjs` |
+| | 对话摘要增量同步到 Wiki（mtime 去重） | `scripts/sync_notes_to_wiki.mjs` |
 | | 文件排除规则（过滤低价值内容） | |
 | | 源文件自动分类（添加 category frontmatter） | `tools/wiki_categorize_vib.py` |
 | | 批量导入并生成结构化 wiki 页面 | `tools/vib_batch_ingest.py` |
@@ -90,6 +91,10 @@ bash scripts/post_rescan.sh --community --trim
 
 # 同步资料到 Wiki
 node scripts/sync_thesis_to_wiki_sources.mjs
+
+# 同步对话摘要到 Wiki
+node scripts/sync_notes_to_wiki.mjs --dry-run   # 先预览
+node scripts/sync_notes_to_wiki.mjs --rescan     # 正式同步 + rescan
 
 # 搜索知识库
 node scripts/wiki_search.mjs search "your keywords" 8
@@ -157,6 +162,7 @@ python tools/progress/status_board.py \
 │   └── commands/                           # /wiki-write, /wiki-summary
 ├── scripts/                                # 工作流脚本
 │   ├── sync_thesis_to_wiki_sources.mjs     # 资料 → Wiki 源目录同步
+│   ├── sync_notes_to_wiki.mjs              # 对话摘要 → Wiki 增量同步
 │   ├── wiki_search.mjs                     # 知识库搜索
 │   ├── wiki_pack.mjs                       # 证据包生成
 │   └── post_rescan.sh                      # rescan 后自动化（图索引/去重/压缩）
@@ -220,6 +226,15 @@ python tools/progress/status_board.py \
                                 ▼
                        AI Agent 工作流
                     /wiki-write · /wiki-summary
+                                │
+                                ▼
+                  ┌──────────────────────────┐
+                  │ sync_notes_to_wiki.mjs   │
+                  │ 对话摘要 → Wiki sources   │
+                  │ （增量同步 + rescan）      │
+                  └──────────┬───────────────┘
+                             │ rescan
+                             └───────▶ LLM Wiki（闭环）
 ```
 
 ## 多项目管理

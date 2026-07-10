@@ -11,8 +11,8 @@ const APP_STATE =
 const DEFAULT_QUERIES = [
   "research topic overview",
   "methodology and experiments",
-  "相机自运动补偿 视频测振 Lee 2020 Su 2025",
-  "validation and results",
+  "key findings and results",
+  "related work and references",
 ]
 
 function loadToken() {
@@ -79,7 +79,7 @@ Examples:
   node scripts/wiki_pack.mjs "topic A keywords" "topic B keywords"
   node scripts/wiki_pack.mjs --out tmp/context.md --topK 10 --full 5 "detailed query"
 
-If no query is provided, the script uses thesis-default queries for S1/S2/S3.`)
+If no query is provided, the script uses generic default queries.`)
 }
 
 function cleanSnippet(text, limit = 900) {
@@ -141,10 +141,10 @@ async function main() {
   lines.push("")
   lines.push("## 使用规则")
   lines.push("")
-  lines.push("- 这个文件是写论文前的临时证据包，不是论文正文。")
-  lines.push("- 写作或改文件时，优先把证据落到 `thesis/` 真实章节里。")
-  lines.push("- 若证据包和本地论文文件冲突，以本地 `thesis/` 文件的最新口径为准，并说明冲突。")
-  lines.push("- 不要把 Wiki 结论夸大成本文已经完成的实验。")
+  lines.push("- 这个文件是临时证据包，不是最终输出。")
+  lines.push("- 使用时优先将证据整合到项目文档中。")
+  lines.push("- 若证据包和本地文件冲突，以本地文件的最新内容为准。")
+  lines.push("- 不要把 Wiki 检索结论夸大成已完成的工作。")
   lines.push("")
   lines.push("## 查询结果")
   for (const section of sections) {
